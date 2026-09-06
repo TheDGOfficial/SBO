@@ -50,10 +50,10 @@ object DianaMobDetect {
     private val kingHitsRegex = """.*?(\d+)\s+Hits.*""".toRegex()
 
     internal enum class RareDianaMob(val display: String, val glowColor: Int) {
-        INQ("Minos Inquisitor", Customization.KingMinosGlowColor),
-        KING("King Minos", Customization.MinosInquisitorGlowColor),
-        SPHINX("Sphinx", Customization.ManticoreGlowColor),
-        MANTI("Manticore", Customization.SphinxGlowColor);
+        INQ("Minos Inquisitor", Customization.MinosInquisitorGlowColor),
+        KING("King Minos", Customization.KingMinosGlowColor),
+        SPHINX("Sphinx", Customization.SphinxGlowColor),
+        MANTI("Manticore", Customization.ManticoreGlowColor);
 
         companion object {
             fun fromName(name: String): RareDianaMob? = entries.firstOrNull { name.contains(it.display, ignoreCase = true) }
