@@ -192,7 +192,7 @@ object RenderUtils3D {
                     cameraPos.z + dZ * compression
                 )
             } else {
-                Vec3(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5)
+                Vec3(pos.x + 0.5, pos.y + 1.5, pos.z + 0.5)
             }
 
             translate(renderPos.x - cameraPos.x, renderPos.y - cameraPos.y, renderPos.z - cameraPos.z)
