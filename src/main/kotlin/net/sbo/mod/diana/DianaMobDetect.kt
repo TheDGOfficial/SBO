@@ -47,7 +47,7 @@ object DianaMobDetect {
     private val mobHpOverlay: Overlay = Overlay(name = "mythosMobHp", x = 10f, y = 10f, exampleView = OverlayExamples.mythosMobHpExample).setCondition { Diana.mythosMobHp }
     private val noShurikenOverlay: Overlay = Overlay(name = "noShuriken", x = 10f, y = 10f, scale = 3f, exampleView = OverlayExamples.dianaStarlessMobExample).setCondition { Diana.noShurikenOverlay }
 
-    private val kingHitsRegex = """.*?(\d+)\s+Hits.*""".toRegex()
+    private val kingHitsRegex = """(?:§[0-9a-fk-or])*.*?(\d+)\s+Hits.*""".toRegex()
 
     internal enum class RareDianaMob(val display: String, val glowColor: Int) {
         INQ("Minos Inquisitor", Customization.MinosInquisitorGlowColor),
