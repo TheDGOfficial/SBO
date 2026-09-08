@@ -1,6 +1,4 @@
 import net.fabricmc.loom.task.RemapJarTask
-import org.jetbrains.kotlin.buildtools.api.ExperimentalBuildToolsApi
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import java.lang.module.ModuleDescriptor.Version
@@ -70,12 +68,6 @@ tasks.withType<KotlinJvmCompile>().configureEach {
 
         moduleName.set("sbo-${mcVersion}") // default is project name which becomes e.g 1.21.11-fabric or 26.1.2-fabric without the sbo naming; The module name is used when generating the mangled name for internal visibility items and the .kotlin_module file in the META-INF directory.
     }
-}
-
-kotlin {
-    // This improves build performance as it supports incremental compilation among other things with the BTA API
-    @OptIn(ExperimentalBuildToolsApi::class, ExperimentalKotlinGradlePluginApi::class)
-    compilerVersion = "2.3.0"
 }
 
 repositories {
