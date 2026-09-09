@@ -1,8 +1,8 @@
 [versions]
 loom = "1.17.20"
 ksp = "2.3.11"
-elementa = "762"
-universalcraft = "517"
+elementa = "774"
+universalcraft = "530"
 junit = "6.1.3"
 
 [plugins]
