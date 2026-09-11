@@ -54,7 +54,7 @@
     "universalcraft": ">=${universalcraft_version}"
   },
   "suggests": {
-    "modmenu": "*"
+    "modmenu": ">=${modmenu_version}"
   },
   "breaks": {
     "noammaddons": "<1.2.5"

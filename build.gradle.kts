@@ -245,6 +245,7 @@ tasks.named<ProcessResources>("processResources") {
     val resourcefulConfigVersion = versionedProperty("rconfig.version")
     val resourcefulConfigKtVersion = versionedProperty("rconfigkt.version")
     val universalCraftVersion = libs.versions.universalcraft.get()
+    val modMenuVersion = versionedProperty("modmenu.version")
 
     val modName = project.property("mod.name")
     val modDescription = project.property("mod.description")
@@ -272,6 +273,7 @@ tasks.named<ProcessResources>("processResources") {
     inputs.property("resourcefulconfig_version", resourcefulConfigVersion)
     inputs.property("resourcefulconfigkt_version", resourcefulConfigKtVersion)
     inputs.property("universalcraft_version", universalCraftVersion)
+    inputs.property("modmenu_version", modMenuVersion)
 
     val expandProperties = mapOf(
         "expanded_files" to expandedFiles,
@@ -292,7 +294,8 @@ tasks.named<ProcessResources>("processResources") {
         "hm_api_version" to hmApiVersion,
         "resourcefulconfig_version" to resourcefulConfigVersion,
         "resourcefulconfigkt_version" to resourcefulConfigKtVersion,
-        "universalcraft_version" to universalCraftVersion
+        "universalcraft_version" to universalCraftVersion,
+        "modmenu_version" to modMenuVersion,
     ) + inputs.properties
 
     filesMatching(expandedFiles) {
