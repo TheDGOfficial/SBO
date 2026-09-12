@@ -830,12 +830,12 @@ object WaypointManager {
             return null
         }
 
-        var warps = hubWarps.filter { it.value.unlocked }.mapValues { it.value }
+        val warps = hubWarps.filter { it.value.unlocked }.toMutableMap()
         for (warp in Diana.allowedWarps) {
             val warpName = warp.lowercaseName
             val additionalWarp = additionalHubWarps[warpName]
             if (additionalWarp != null && additionalWarp.unlocked) {
-                warps = warps + (warpName to additionalWarp)
+                warps[warpName] = additionalWarp
             }
         }
 
