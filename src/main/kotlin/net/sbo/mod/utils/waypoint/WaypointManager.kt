@@ -462,7 +462,34 @@ object WaypointManager {
             }
         }
 
-        removeStaleRareMobWaypoints(rareMobPositions)
+        removeStaleRareMobWaypoints(existing, rareMobPositions)
+    }
+
+    private fun removeStaleRareMobWaypoints(existing: List<Waypoint>, rareMobPositions: List<SboVec>) {
+        val player = mc.player ?: return
+        val playerPos = SboVec(player.x, player.y, player.z)
+
+        existing.forEach { waypoint ->
+            if (playerPos.distanceTo(waypoint.pos) > RARE_MOB_VALIDATION_DISTANCE) {
+                waypoint.rareMobMissingTicks = 0
+                return@forEach
+            }
+
+            val mobPresent = rareMobPositions.any {
+                it.distanceTo(waypoint.pos) <= RARE_MOB_VALIDATION_DISTANCE
+            }
+
+            if (mobPresent) {
+                waypoint.rareMobMissingTicks = 0
+                return@forEach
+            }
+
+            waypoint.rareMobMissingTicks++
+
+            if (waypoint.rareMobMissingTicks >= RARE_MOB_STALE_TICKS) {
+                removeWaypoint(waypoint)
+            }
+        }
     }
 
     private fun addRareMobWaypoint(
@@ -487,33 +514,6 @@ object WaypointManager {
 
         addWaypoint(waypoint)
         return waypoint
-    }
-
-    private fun removeStaleRareMobWaypoints(rareMobPositions: List<SboVec>) {
-        val player = mc.player ?: return
-        val playerPos = SboVec(player.x, player.y, player.z)
-
-        getWaypointsOfType("rareMob").forEach { waypoint ->
-            if (playerPos.distanceTo(waypoint.pos) > RARE_MOB_VALIDATION_DISTANCE) {
-                waypoint.rareMobMissingTicks = 0
-                return@forEach
-            }
-
-            val mobPresent = rareMobPositions.any {
-                it.distanceTo(waypoint.pos) <= RARE_MOB_VALIDATION_DISTANCE
-            }
-
-            if (mobPresent) {
-                waypoint.rareMobMissingTicks = 0
-                return@forEach
-            }
-
-            waypoint.rareMobMissingTicks++
-
-            if (waypoint.rareMobMissingTicks >= RARE_MOB_STALE_TICKS) {
-                removeWaypoint(waypoint)
-            }
-        }
     }
 
     fun removeNearbyRareMobWaypointAt(pos: SboVec) {
@@ -832,12 +832,10 @@ object WaypointManager {
 
         var warps = hubWarps.filter { it.value.unlocked }.mapValues { it.value }
         for (warp in Diana.allowedWarps) {
-            val warpName = warp.name.lowercase()
-            if (additionalHubWarps.containsKey(warpName)) {
-                val additionalWarp = additionalHubWarps[warpName]
-                if (additionalWarp != null && additionalWarp.unlocked) {
-                    warps = warps + (warpName to additionalWarp)
-                }
+            val warpName = warp.lowercaseName
+            val additionalWarp = additionalHubWarps[warpName]
+            if (additionalWarp != null && additionalWarp.unlocked) {
+                warps = warps + (warpName to additionalWarp)
             }
         }
 

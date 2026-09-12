@@ -38,5 +38,7 @@ enum class AdditionalHubWarps {
     STONKS,
     DA,
     TAYLOR,
-    MUSEUM
+    MUSEUM;
+
+    val lowercaseName: String = name.lowercase()
 }

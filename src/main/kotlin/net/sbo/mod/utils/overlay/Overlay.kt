@@ -145,7 +145,7 @@ class Overlay(
 
     private fun inEditingScreen(): Boolean = Helper.currentScreen is OverlayEditScreen
 
-    private fun checkCondition(): Boolean = condition() && checkExtraCondition()
+    fun checkCondition(): Boolean = condition() && checkExtraCondition()
 
     private fun checkExtraCondition(): Boolean =
         // When on the editing screen, show overlays even if condition is not met. Some overlays can e.g. only render whilst in The Hub, but the user needs to be able to edit it's position outside of The Hub as well.

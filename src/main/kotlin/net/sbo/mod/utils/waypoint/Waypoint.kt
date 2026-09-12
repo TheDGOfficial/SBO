@@ -22,35 +22,12 @@ private const val MAX_OPACITY = 1.0f
 private const val FADE_START_DISTANCE = 4.5
 private const val FADE_END_DISTANCE = 100.0
 
-internal fun calculateDynamicOpacity(distance: Double): Float {
-    if (!distance.isFinite()) {
-        return MAX_OPACITY
-    }
-
-    if (Customization.lookAlike) {
-        val distanceSquared = distance * distance
-
-        return (0.1f + 0.005f * distanceSquared.toFloat())
-            .coerceIn(MIN_OPACITY, MAX_OPACITY)
-    }
-
-    if (distance <= FADE_START_DISTANCE) {
-        return MIN_OPACITY
-    }
-
-    if (distance >= FADE_END_DISTANCE) {
-        return MAX_OPACITY
-    }
-
-    val progress = (
-        (distance - FADE_START_DISTANCE) /
-            (FADE_END_DISTANCE - FADE_START_DISTANCE)
-    ).toFloat()
-
-    return (
-        MIN_OPACITY +
-            (MAX_OPACITY - MIN_OPACITY) * progress
-    ).coerceIn(MIN_OPACITY, MAX_OPACITY)
+internal fun calculateDynamicOpacity(distance: Double): Float = when {
+    !distance.isFinite() -> MAX_OPACITY
+    Customization.lookAlike -> (0.1f + 0.005f * (distance * distance).toFloat()).coerceIn(MIN_OPACITY, MAX_OPACITY)
+    distance <= FADE_START_DISTANCE -> MIN_OPACITY
+    distance >= FADE_END_DISTANCE -> MAX_OPACITY
+    else -> MIN_OPACITY + (MAX_OPACITY - MIN_OPACITY) * ((distance - FADE_START_DISTANCE) / (FADE_END_DISTANCE - FADE_START_DISTANCE)).toFloat()
 }
 
 /**
@@ -83,11 +60,11 @@ class Waypoint(
     private var formattedText: String = text
         set(value) {
             field = value
-            textWidth = mc.font.width(value)
             hasText = value.isNotEmpty()
 
-            component = ChatUtils.fromLegacy(value)
+            component = Component.nullToEmpty(value)
             visualOrderText = component.visualOrderText
+            textWidth = mc.font.width(visualOrderText)
         }
     private var textWidth = mc.font.width(text)
     private var hasText = text.isNotEmpty()
@@ -99,7 +76,7 @@ class Waypoint(
     var preventInvalidRemoval = false
     var rareMobMissingTicks: Int = 0
 
-    private var visualOrderText = ChatUtils.fromLegacy(text).visualOrderText
+    private var visualOrderText = Component.nullToEmpty(text).visualOrderText
 
     private var secondaryText: Component? = null
     private var secondaryTextWidth = 0
@@ -149,7 +126,7 @@ class Waypoint(
     private fun setSecondaryDistanceText() {
         if (!Customization.lookAlike || distanceText.isEmpty()) return
 
-        val component = ChatUtils.fromLegacy(distanceText.trim())
+        val component = Component.nullToEmpty(distanceText.trim())
 
         secondaryText = component
         secondaryTextWidth = mc.font.width(component)
@@ -263,7 +240,7 @@ class Waypoint(
             }
 
             "rareMob" -> {
-                val newest = inqWaypoints.lastOrNull() == this
+                val newest = inqWaypoints.last() == this
 
                 if (newest) isClosest = true
                 this.line = newest && Diana.inqLine && this.distanceRaw >= 8.0
