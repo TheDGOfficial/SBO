@@ -5,7 +5,7 @@ import net.sbo.mod.SBOKotlin.mc
 import net.sbo.mod.overlays.OverlayUtils.LootItemData
 import net.sbo.mod.settings.categories.Diana
 import net.sbo.mod.utils.Helper
-import net.sbo.mod.utils.Helper.calcPercentOne
+import net.sbo.mod.utils.Helper.calcPercentOneReflectively
 import net.sbo.mod.utils.Helper.removeFormatting
 import net.sbo.mod.utils.SboTimerManager
 import net.sbo.mod.utils.data.DianaTracker
