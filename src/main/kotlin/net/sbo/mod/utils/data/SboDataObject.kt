@@ -17,6 +17,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import kotlin.reflect.KMutableProperty1
@@ -62,6 +64,9 @@ object SboDataObject {
 
     private val caseSensitive by lazy { isCaseSensitive(FabricLoader.getInstance().configDir.toFile().toPath()) }
     val dataDir by lazy { normalizeConfigDir("sbo", FabricLoader.getInstance().configDir.toFile().toPath(), "SBO", "sbo", caseSensitive).fileName.toString() }
+
+    private val dirtyConfigs = ConcurrentHashMap.newKeySet<String>()
+    private val dirtySaveQueued = AtomicBoolean(false)
 
     private fun isCaseSensitive(baseDir: Path): Boolean {
         val tempDir = try {
@@ -253,6 +258,7 @@ object SboDataObject {
         soundSettingsData = SBOConfigBundle.soundSettingsData
         saveAllDataThreaded(dataDir)
         savePeriodically(5)
+        Register.onTick(20) { saveDirtyData() }
     }
 
     @SboEvent
@@ -779,23 +785,43 @@ object SboDataObject {
     private fun writerForFile(file: File): Writer = BufferedWriter(FileWriter(file))
 
     /**
-     * Saves the specified config by its name.
+     * Marks the specified config as needing to be saved.
+     * The config will be written to disk on the next periodic save tick.
      * If the config name is not valid, it will log a warning.
      * @param configName The name of the config to save.
      */
     fun save(configName: String) {
-        DATA_SAVER_EXECUTOR.execute {
-            configMapForSave[configName]?.first?.invoke()
-                ?: SBOKotlin.logger.warn("[$configName] is not a valid config name. Please use a valid config name")
+        if (configMapForSave.containsKey(configName)) {
+            dirtyConfigs.add(configName)
+        } else {
+            SBOKotlin.logger.warn("[$configName] is not a valid config name. Please use a valid config name")
+        }
+    }
+
+    private fun saveDirtyData() {
+        if (dirtyConfigs.isEmpty() || !dirtySaveQueued.compareAndSet(false, true)) return
+
+        try {
+            DATA_SAVER_EXECUTOR.execute {
+                try {
+                    while (true) {
+                        val configName = dirtyConfigs.firstOrNull() ?: break
+                        if (!dirtyConfigs.remove(configName)) continue
+                        configMapForSave[configName]?.first?.invoke()
+                    }
+                } finally {
+                    dirtySaveQueued.set(false)
+                }
+            }
+        } catch (e: RuntimeException) {
+            dirtySaveQueued.set(false)
+            throw e
         }
     }
 
     fun saveTrackerData() {
-        DATA_SAVER_EXECUTOR.execute {
-            save(dataDir, dianaTrackerTotal, "dianaTrackerTotal.json")
-            save(dataDir, dianaTrackerSession, "dianaTrackerSession.json")
-            save(dataDir, dianaTrackerMayor, "dianaTrackerMayor.json")
-            SBOKotlin.logger.debug("[SBO] Diana Tracker data saved successfully.")
-        }
+        save("DianaTrackerTotalData")
+        save("DianaTrackerSessionData")
+        save("DianaTrackerMayorData")
     }
 }
