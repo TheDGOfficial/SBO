@@ -142,7 +142,7 @@ object DianaLoot : DirtyFlushableOverlay() {
         val formattedName = "$color${data.name}: $AQUA${Helper.formatNumber(amount, withCommas = true)}"
         val price = Helper.getItemPriceFormatted(itemName.replace("_LS", ""), amount)
         val percent = data.dropMobId?.let { dropId ->
-            calcPercentOne(tracker.items, tracker.mobs, itemName, dropId)
+            calcPercentOneReflectively(tracker.items, tracker.mobs, itemName, dropId)
         }
         val percentText = percent?.let { " $GRAY($AQUA$it%$GRAY)" } ?: ""
         val hidePrice = Diana.ironmanOverrides && Helper.getItemPrice(itemName.replace("_LS", ""), amount) == 0L
@@ -169,11 +169,11 @@ object DianaLoot : DirtyFlushableOverlay() {
         val priceLs = if (hidePrices) "$DARK_GRAY  -  " else "$GOLD${Helper.getItemPriceFormatted(itemNameLs.replace("_LS", ""), amountLs)}"
         val priceCombined = if (hidePrices) "$DARK_GRAY  -  " else "$GOLD${Helper.getItemPriceFormatted(itemNameBase, totalAmount)}"
         val percent = data.dropMobId?.let { dropId ->
-            calcPercentOne(tracker.items, tracker.mobs, itemNameBase, dropId)
+            calcPercentOneReflectively(tracker.items, tracker.mobs, itemNameBase, dropId)
         }
         val percentText = percent?.let { " $GRAY($AQUA$it%$GRAY)" } ?: ""
         val percentLs = data.dropMobLsId?.let { dropLsId ->
-            calcPercentOne(tracker.items, tracker.mobs, itemNameLs, dropLsId)
+            calcPercentOneReflectively(tracker.items, tracker.mobs, itemNameLs, dropLsId)
         }
         val percentLsText = percentLs?.let { " $GRAY($AQUA$it%$GRAY)" } ?: ""
         val color = if (Diana.ironmanOverrides && data.id == "WASHED_UP_SOUVENIR") DARK_GREEN else data.color

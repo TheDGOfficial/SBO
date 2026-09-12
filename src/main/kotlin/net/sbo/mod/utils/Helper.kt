@@ -230,13 +230,13 @@ object Helper {
         name = name.replace(Regex("[^a-zA-Z0-9_]"), "")
         return name.trim()
     }
-    
+
     /**
      * Calculate percentage of one property to another.
      * If [mobName] is provided, it calculates the percentage of [propertyName] from [items] to [mobName] from [mobs].
      * If [mobName] is null, it calculates the percentage of [propertyName] from [mobs] to total mobs.
      */
-    fun calcPercentOne(items: DianaItemsData, mobs: DianaMobsData, propertyName: String, mobName: String? = null): String {
+    fun calcPercentOneReflectively(items: DianaItemsData, mobs: DianaMobsData, propertyName: String, mobName: String? = null): String {
         val result: Double = if (mobName != null) {
             val itemCount = items::class.memberProperties.firstOrNull { it.name == propertyName }
                 ?.call(items) as? Int ?: 0
@@ -245,6 +245,7 @@ object Helper {
 
             if (mobCount <= 0) 0.0
             else itemCount.toDouble() / mobCount.toDouble() * 100
+
         } else {
             val mobCount = mobs::class.memberProperties.firstOrNull { it.name == propertyName }
                 ?.call(mobs) as? Int ?: 0
@@ -253,6 +254,17 @@ object Helper {
             if (totalMobsCount <= 0) 0.0
             else mobCount.toDouble() / totalMobsCount.toDouble() * 100
         }
+
+        return "%.2f".format(Locale.US, result)
+    }
+
+    fun calcPercentOne(itemCount: Int, mobCount: Int): String {
+        val result = if (mobCount <= 0) {
+            0.0
+        } else {
+            itemCount.toDouble() / mobCount * 100
+        }
+
         return "%.2f".format(Locale.US, result)
     }
 
@@ -575,10 +587,10 @@ object Helper {
         val items = SboDataObject.dianaTrackerMayor.items
         val sboData = SboDataObject.sboData
 
-        val kingPercent = calcPercentOne(items, mobs, "KING_MINOS")
-        val manticorePercent = calcPercentOne(items, mobs, "MANTICORE")
-        val inqPercent = calcPercentOne(items, mobs, "MINOS_INQUISITOR")
-        val sphinxPercent = calcPercentOne(items, mobs, "SPHINX")
+        val kingPercent = calcPercentOne(mobs.KING_MINOS, mobs.TOTAL_MOBS)
+        val manticorePercent = calcPercentOne(mobs.MANTICORE, mobs.TOTAL_MOBS)
+        val inqPercent = calcPercentOne(mobs.MINOS_INQUISITOR, mobs.TOTAL_MOBS)
+        val sphinxPercent = calcPercentOne(mobs.SPHINX, mobs.TOTAL_MOBS)
 
         when (mob.lowercase()) {
             "minos inquisitor", "inq" -> {
